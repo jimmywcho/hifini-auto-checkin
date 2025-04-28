@@ -22,10 +22,15 @@ jobs:
         with:
           node-version: latest
 
-      - name: Workflow Keepalive
-        uses: liskin/gh-workflow-keepalive@v1.2.1
-
       - name: Checkin
         shell: bash
         run: |
           node main.js
+
+  workflow-keepalive:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: liskin/gh-workflow-keepalive@v1.2.1
