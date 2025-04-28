@@ -1,10 +1,10 @@
 name: HIFINI-Auto-Checkin
 
 on:
-  workflow_dispatch:
   schedule:
     # UTC+8 ??:??
-    - cron: "40 23 * * *"
+    - cron: "12 10 * * *"
+#  workflow_dispatch:
 
 jobs:
   checkin:
