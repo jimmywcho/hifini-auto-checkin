@@ -22,6 +22,9 @@ jobs:
         with:
           node-version: latest
 
+      - name: Workflow Keepalive
+        uses: liskin/gh-workflow-keepalive@v1.2.1
+
       - name: Checkin
         shell: bash
         run: |
