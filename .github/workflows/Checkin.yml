@@ -13,6 +13,7 @@ jobs:
     environment: HIFINI
     env:
       COOKIE: ${{ secrets.COOKIE }}
+      MUDAIBA_COOKIE: ${{ secrets.MUDAIBA_COOKIE }}
 
     steps:
       - uses: actions/checkout@v4
@@ -22,10 +23,15 @@ jobs:
         with:
           node-version: latest
 
-      - name: Checkin
+      - name: Checkin Main
         shell: bash
         run: |
           node main.js
+
+      - name: Checkin Mudaiba
+        shell: bash
+        run: |
+          node main_mudaiba.js
 
   workflow-keepalive:
     if: github.event_name == 'schedule'
