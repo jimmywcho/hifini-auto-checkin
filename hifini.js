@@ -1,69 +1,56 @@
-const signPageUrl = "https://hifiti.com//sg_sign.htm";
+const signPageUrl = "https://hifiti.com/sg_sign.htm";
 
-const responseSuccessCode = "0";
-
-function generateBaseHeaders(cookie) {
+function buildHeaders(cookie) {
   return {
     Cookie: cookie,
+    // 盡量模擬瀏覽器，減少被誤判機器人
     "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    Accept: "application/json, text/plain, */*",
+    "X-Requested-With": "XMLHttpRequest",
+    Referer: "https://hifiti.com/",
   };
 }
 
-async function getSign(cookie) {
-  const response = await fetch(signPageUrl, {
-    headers: generateBaseHeaders(cookie),
+async function checkIn(cookie) {
+  const res = await fetch(signUrl, {
+    method: "POST",
+    headers: buildHeaders(cookie),
+    body: null,
   });
 
-  const resText = await response.text();
-
-  const re = /var sign\s*=\s*"([^"]+)"/;
-  const sign = re.exec(resText)[1];
-
-  return sign;
-}
-
-function checkIn(cookie, sign) {
-  fetch(signPageUrl, {
-    method: "POST",
-    headers: {
-      ...generateBaseHeaders(cookie),
-      // necessary for POST XMLHttpRequest
-      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-      "X-Requested-With": "XMLHttpRequest",
-    },
-    body: `sign=${sign}`,
-  })
-    .then((res) => res.json())
-    .then((resJson) => {
-      if (resJson.code === responseSuccessCode) {
-        // console.log("签到成功");
-        console.log(resJson.message);
-        //
-      } else {
-        if (resJson.message === "今天已经签过啦！") {
-          console.log(resJson.message);
-          return;
-        }
-        // console.log("签到失败");
-        throw new Error(resJson.message);
-        //
-      }
-    });
-}
-
-async function main() {
-  let cookie;
-  if (process.env.COOKIE) {
-    cookie = process.env.COOKIE;
-  } else {
-    console.log("COOKIE NOT FOUND");
+  const raw = await res.text();
+  let json;
+  try {
+    json = JSON.parse(raw);
+    // console.log(" ✅簽到回應：", json);
+  } catch (_) {
+    console.error("⚠ 無法解析回應，原始內容：", raw);
     process.exit(1);
   }
 
-  let sign = await getSign(cookie);
+  if (json.code === '0') {
+    console.log("✅ 簽到成功 " + json.message);
+  } else if (json.code === 1) {
+    console.log("ℹ️  " + json.message);
+  } else {
+    console.error("❌  簽到失敗：" + JSON.stringify(json));
+    process.exit(1);
+  }
+}
+async function main() {
+  const cookie = process.env.COOKIE;
+  if (!cookie) {
+    console.error("❌  未找到 COOKIE 環境變量，請先設定。");
+    process.exit(1);
+  }
 
-  checkIn(cookie, sign);
+  try {
+    await checkIn(cookie);
+  } catch (err) {
+    console.error("❌  過程中出現錯誤：", err);
+    process.exit(1);
+  }
 }
 
 main();
