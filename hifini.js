@@ -13,7 +13,7 @@ function buildHeaders(cookie) {
 }
 
 async function checkIn(cookie) {
-  const res = await fetch(signUrl, {
+  const res = await fetch(signPageUrl, {
     method: "POST",
     headers: buildHeaders(cookie),
     body: null,
