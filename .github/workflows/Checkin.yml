@@ -1,6 +1,9 @@
 name: HIFINI-Auto-Checkin
 
 on:
+  push:
+    branches-ignore:
+      - master
   schedule:
     # UTC+8 ??:??
     - cron: "15 14 * * *"
@@ -12,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: HIFINI
     env:
-      COOKIE: ${{ secrets.COOKIE }}
+      COOKIE: ${{ secrets.HIFINI_COOKIE }}
 
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +28,7 @@ jobs:
       - name: Checkin Main
         shell: bash
         run: |
-          node main.js
+          node hifini.js
 
   workflow-keepalive:
     if: github.event_name == 'schedule'
