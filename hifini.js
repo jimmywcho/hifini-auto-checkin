@@ -22,7 +22,7 @@ function checkIn(cookie) {
   })
       .then((res) => res.json())
       .then((resJson) => {
-        console.log(`resJson: ${JSON.stringify(resJson)}`);
+        // console.log(`resJson: ${JSON.stringify(resJson)}`);
         if (resJson.code === responseSuccessCode) {
           // console.log("签到成功");
           console.log(resJson.message);
