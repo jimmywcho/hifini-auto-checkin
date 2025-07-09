@@ -1,6 +1,9 @@
 name: HIFINI-Auto-Checkin
 
 on:
+  push:
+    branches-ignore:
+      - master
   schedule:
     # UTC+8 ??:??
     - cron: "15 14 * * *"
